@@ -526,10 +526,9 @@ class LoanServiceImplTest {
   @DisplayName("Should get overdue loans when user id provided")
   void shouldGetOverdueLoans_WhenUserIdProvided() {
     // Arrange
-    LocalDateTime now = LocalDateTime.now();
     List<Loan> loans = List.of(testLoan);
 
-    when(loanRepository.findOverdueLoansByUserId(testUserId, now, LoanStatus.BORROWED))
+    when(loanRepository.findOverdueLoansByUserId(eq(testUserId), any(LocalDateTime.class), eq(LoanStatus.BORROWED)))
         .thenReturn(loans);
     when(loanMapper.toDTO(testLoan)).thenReturn(testLoanDTO);
 
@@ -539,7 +538,7 @@ class LoanServiceImplTest {
     // Assert
     assertNotNull(result);
     assertEquals(1, result.size());
-    verify(loanRepository, times(1)).findOverdueLoansByUserId(testUserId, any(LocalDateTime.class), eq(LoanStatus.BORROWED));
+    verify(loanRepository, times(1)).findOverdueLoansByUserId(eq(testUserId), any(LocalDateTime.class), eq(LoanStatus.BORROWED));
     verify(loanMapper, times(1)).toDTO(testLoan);
   }
 

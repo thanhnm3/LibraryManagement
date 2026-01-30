@@ -37,6 +37,7 @@ public class Author {
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
+	@Builder.Default
 	@ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)
 	private List<Book> books = new ArrayList<>();
 }

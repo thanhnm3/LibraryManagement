@@ -188,9 +188,10 @@ class UserServiceImplTest {
   void shouldChangePassword_WhenOldPasswordCorrect() {
     // Arrange
     Long userId = 1L;
-    user.setPasswordHash("hashedOldPassword");
+    String hashedOldPassword = "hashedOldPassword";
+    user.setPasswordHash(hashedOldPassword);
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPasswordHash())).thenReturn(true);
+    when(passwordEncoder.matches(changePasswordDTO.getOldPassword(), hashedOldPassword)).thenReturn(true);
     when(passwordEncoder.encode(changePasswordDTO.getNewPassword())).thenReturn("hashedNewPassword");
     when(userRepository.save(user)).thenReturn(user);
 
@@ -199,7 +200,7 @@ class UserServiceImplTest {
 
     // Assert
     verify(userRepository, times(1)).findById(userId);
-    verify(passwordEncoder, times(1)).matches(changePasswordDTO.getOldPassword(), user.getPasswordHash());
+    verify(passwordEncoder, times(1)).matches(changePasswordDTO.getOldPassword(), hashedOldPassword);
     verify(passwordEncoder, times(1)).encode(changePasswordDTO.getNewPassword());
     verify(userRepository, times(1)).save(user);
   }

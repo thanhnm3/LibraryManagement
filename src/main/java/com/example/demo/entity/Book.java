@@ -45,25 +45,21 @@ public class Book {
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
 
+	@Builder.Default
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-		name = "book_authors",
-		joinColumns = @JoinColumn(name = "book_id"),
-		inverseJoinColumns = @JoinColumn(name = "author_id")
-	)
+	@JoinTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "author_id"))
 	private List<Author> authors = new ArrayList<>();
 
+	@Builder.Default
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-		name = "book_categories",
-		joinColumns = @JoinColumn(name = "book_id"),
-		inverseJoinColumns = @JoinColumn(name = "category_id")
-	)
+	@JoinTable(name = "book_categories", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
 	private List<Category> categories = new ArrayList<>();
 
+	@Builder.Default
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Loan> loans = new ArrayList<>();
 
+	@Builder.Default
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Review> reviews = new ArrayList<>();
 }

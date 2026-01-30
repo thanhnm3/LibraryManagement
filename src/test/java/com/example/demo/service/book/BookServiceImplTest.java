@@ -89,13 +89,11 @@ class BookServiceImplTest {
   private Category testCategory;
   private Long testBookId;
   private Long testPublisherId;
-  private String testIsbn;
 
   @BeforeEach
   void setUp() {
     testBookId = 1L;
     testPublisherId = 1L;
-    testIsbn = "1234567890";
     testBook = TestDataBuilder.createBook();
     testBookDTO = TestDataBuilder.createBookDTO();
     testBookDetailDTO = TestDataBuilder.createBookDetailDTO();
@@ -116,6 +114,7 @@ class BookServiceImplTest {
     // Arrange
     List<Long> authorIds = List.of(1L);
     List<Long> categoryIds = List.of(1L);
+    testBookRequestDTO.setPublisherId(testPublisherId);
     testBookRequestDTO.setAuthorIds(authorIds);
     testBookRequestDTO.setCategoryIds(categoryIds);
 
@@ -168,6 +167,7 @@ class BookServiceImplTest {
   @DisplayName("Should throw exception when publisher not found")
   void shouldThrowException_WhenPublisherNotFound() {
     // Arrange
+    testBookRequestDTO.setPublisherId(testPublisherId);
     when(bookRepository.findByIsbn(testBookRequestDTO.getIsbn())).thenReturn(Optional.empty());
     when(publisherRepository.findById(testPublisherId)).thenReturn(Optional.empty());
 
@@ -190,10 +190,12 @@ class BookServiceImplTest {
   void shouldThrowException_WhenAuthorNotFound() {
     // Arrange
     List<Long> authorIds = List.of(1L, 2L);
+    testBookRequestDTO.setPublisherId(testPublisherId);
     testBookRequestDTO.setAuthorIds(authorIds);
 
     when(bookRepository.findByIsbn(testBookRequestDTO.getIsbn())).thenReturn(Optional.empty());
     when(publisherRepository.findById(testPublisherId)).thenReturn(Optional.of(testPublisher));
+    when(bookMapper.toEntity(testBookRequestDTO)).thenReturn(testBook);
     when(authorRepository.findAllById(authorIds)).thenReturn(List.of(testAuthor));
 
     // Act & Assert
@@ -214,10 +216,12 @@ class BookServiceImplTest {
   void shouldThrowException_WhenCategoryNotFound() {
     // Arrange
     List<Long> categoryIds = List.of(1L, 2L);
+    testBookRequestDTO.setPublisherId(testPublisherId);
     testBookRequestDTO.setCategoryIds(categoryIds);
 
     when(bookRepository.findByIsbn(testBookRequestDTO.getIsbn())).thenReturn(Optional.empty());
     when(publisherRepository.findById(testPublisherId)).thenReturn(Optional.of(testPublisher));
+    when(bookMapper.toEntity(testBookRequestDTO)).thenReturn(testBook);
     when(categoryRepository.findAllById(categoryIds)).thenReturn(List.of(testCategory));
 
     // Act & Assert

@@ -4,7 +4,6 @@ import com.example.demo.dto.author.AuthorDTO;
 import com.example.demo.dto.author.AuthorDetailDTO;
 import com.example.demo.dto.author.AuthorRequestDTO;
 import com.example.demo.dto.author.AuthorUpdateDTO;
-import com.example.demo.dto.book.BookDTO;
 import com.example.demo.entity.Author;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -83,7 +82,7 @@ public class AuthorMapper {
 	/**
 	 * Update Author entity from AuthorUpdateDTO
 	 * 
-	 * @param author   - Author entity to update
+	 * @param author    - Author entity to update
 	 * @param updateDTO - AuthorUpdateDTO with new values
 	 */
 	public void updateEntityFromDTO(Author author, AuthorUpdateDTO updateDTO) {

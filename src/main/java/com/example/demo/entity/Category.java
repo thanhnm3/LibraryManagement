@@ -29,6 +29,7 @@ public class Category {
 	@Column(columnDefinition = "TEXT")
 	private String description;
 
+	@Builder.Default
 	@ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
 	private List<Book> books = new ArrayList<>();
 }

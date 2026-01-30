@@ -38,10 +38,12 @@ public class User {
 	@Column(name = "full_name", nullable = false, length = 100)
 	private String fullName;
 
+	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private UserStatus status = UserStatus.ACTIVE;
 
+	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private UserRole role = UserRole.MEMBER;
@@ -50,9 +52,11 @@ public class User {
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
+	@Builder.Default
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Loan> loans = new ArrayList<>();
 
+	@Builder.Default
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Review> reviews = new ArrayList<>();
 }

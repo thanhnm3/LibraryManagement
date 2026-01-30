@@ -40,6 +40,7 @@ public class Publisher {
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
+	@Builder.Default
 	@OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Book> books = new ArrayList<>();
 }

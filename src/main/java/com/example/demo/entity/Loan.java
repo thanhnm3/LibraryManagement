@@ -31,6 +31,7 @@ public class Loan {
 	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
+	@Builder.Default
 	@Column(name = "borrow_date", nullable = false, updatable = false)
 	private LocalDateTime borrowDate = LocalDateTime.now();
 
@@ -40,6 +41,7 @@ public class Loan {
 	@Column(name = "return_date")
 	private LocalDateTime returnDate;
 
+	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private LoanStatus status = LoanStatus.BORROWED;
