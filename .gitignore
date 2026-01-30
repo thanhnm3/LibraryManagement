@@ -136,3 +136,5 @@ Desktop.ini
 .temp/
 .tmp/
 .cache/
+.cursor/
+.shared/
