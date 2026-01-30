@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-body text-slate-800 antialiased;
+  }
+}
+
+@layer components {
+  .clay-card {
+    @apply rounded-clay-lg border-[3px] border-white/80 bg-clay-cream shadow-clay transition-all duration-200 ease-out;
+  }
+
+  .clay-card:hover {
+    @apply shadow-clay-press cursor-pointer;
+  }
+
+  .clay-btn {
+    @apply rounded-clay border-[3px] border-white/90 font-heading font-semibold shadow-clay transition-all duration-200 ease-out active:shadow-clay-inset;
+  }
+
+  .clay-btn:hover {
+    @apply shadow-clay-press cursor-pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
