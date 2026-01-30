@@ -45,34 +45,39 @@ Hệ thống quản lý thư viện được xây dựng bằng Spring Boot, cun
 
 ```
 demo/
-├── src/
-│   ├── main/
-│   │   ├── java/com/example/demo/
-│   │   │   ├── config/              # Configuration classes
-│   │   │   ├── controller/          # REST Controllers
-│   │   │   ├── service/             # Business logic layer
-│   │   │   │   ├── author/
-│   │   │   │   ├── book/
-│   │   │   │   ├── category/
-│   │   │   │   ├── publisher/
-│   │   │   │   ├── review/
-│   │   │   │   └── user/
-│   │   │   ├── repository/          # Data access layer
-│   │   │   ├── mapper/              # Entity-DTO mapping
-│   │   │   ├── dto/                 # Data Transfer Objects
-│   │   │   ├── entity/              # JPA Entities
-│   │   │   ├── enums/               # Enum classes
-│   │   │   └── exception/           # Custom exceptions
-│   │   └── resources/
-│   │       └── application.properties
-│   └── test/
-│       └── java/com/example/demo/
-│           ├── service/             # Service tests
-│           └── util/                # Test utilities
-├── docker/
-│   └── init/                        # Database initialization scripts
-├── build.gradle                     # Build configuration
-├── docker-compose.yml               # Docker Compose configuration
+├── backend/                         # Spring Boot API
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/example/demo/
+│   │   │   │   ├── config/          # Configuration classes
+│   │   │   │   ├── controller/     # REST Controllers
+│   │   │   │   ├── service/         # Business logic layer
+│   │   │   │   │   ├── author/
+│   │   │   │   │   ├── book/
+│   │   │   │   │   ├── category/
+│   │   │   │   │   ├── publisher/
+│   │   │   │   │   ├── review/
+│   │   │   │   │   └── user/
+│   │   │   │   ├── repository/      # Data access layer
+│   │   │   │   ├── mapper/          # Entity-DTO mapping
+│   │   │   │   ├── dto/             # Data Transfer Objects
+│   │   │   │   ├── entity/          # JPA Entities
+│   │   │   │   ├── enums/           # Enum classes
+│   │   │   │   └── exception/       # Custom exceptions
+│   │   │   └── resources/
+│   │   │       └── application.properties
+│   │   └── test/
+│   │       └── java/com/example/demo/
+│   │           ├── service/         # Service tests
+│   │           └── util/            # Test utilities
+│   ├── docker/
+│   │   └── init/                    # Database initialization scripts
+│   ├── build.gradle                 # Build configuration
+│   ├── docker-compose.yml           # Docker Compose (PostgreSQL)
+│   ├── gradlew
+│   └── settings.gradle
+├── frontend/                        # Frontend (Vue/React/Nuxt... – chưa triển khai)
+├── docker-compose.yml               # Chạy từ root: PostgreSQL
 └── README.md
 ```
 
@@ -265,13 +270,20 @@ cd demo
 
 ### Bước 2: Khởi động PostgreSQL bằng Docker Compose
 
+Từ **root** repo (hoặc từ `backend/`):
+
 ```bash
+# Từ root repo
+docker-compose up -d
+
+# Hoặc từ thư mục backend
+cd backend
 docker-compose up -d
 ```
 
 Lệnh này sẽ:
 - Tạo PostgreSQL container
-- Tự động chạy scripts trong `docker/init/` để tạo database schema
+- Tự động chạy scripts trong `backend/docker/init/` để tạo database schema
 - Load seed data (nếu có)
 
 Kiểm tra container đang chạy:
@@ -281,7 +293,7 @@ docker ps
 
 ### Bước 3: Cấu hình Database (nếu cần)
 
-File `src/main/resources/application.properties`:
+File `backend/src/main/resources/application.properties`:
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5433/demo_db
@@ -292,6 +304,8 @@ spring.datasource.password=demo_password
 ### Bước 4: Build project
 
 ```bash
+cd backend
+
 # Windows
 gradlew.bat build
 
@@ -302,6 +316,8 @@ gradlew.bat build
 ### Bước 5: Chạy ứng dụng
 
 ```bash
+cd backend
+
 # Windows
 gradlew.bat bootRun
 
@@ -309,8 +325,9 @@ gradlew.bat bootRun
 ./gradlew bootRun
 ```
 
-Hoặc chạy trực tiếp:
+Hoặc chạy JAR trực tiếp:
 ```bash
+cd backend
 java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
 ```
 
@@ -346,8 +363,8 @@ curl http://localhost:8080/api/authors
 - **Book ↔ Review**: One-to-Many
 
 ### Database Schema được tạo tự động từ:
-- `docker/init/initial.sql` - Tạo tables và constraints
-- `docker/init/seed_data.sql` - Seed data (nếu có)
+- `backend/docker/init/initial.sql` - Tạo tables và constraints
+- `backend/docker/init/seed_data.sql` - Seed data (nếu có)
 
 ## 📡 API Endpoints
 
@@ -405,6 +422,8 @@ curl http://localhost:8080/api/authors
 ### Chạy tất cả tests
 
 ```bash
+cd backend
+
 # Windows
 gradlew.bat test
 
@@ -415,13 +434,14 @@ gradlew.bat test
 ### Chạy test với coverage
 
 ```bash
+cd backend
 gradlew test jacocoTestReport
 ```
 
 ### Test Structure
 
 ```
-src/test/java/com/example/demo/
+backend/src/test/java/com/example/demo/
 ├── service/
 │   ├── author/AuthorServiceImplTest.java
 │   ├── book/BookServiceImplTest.java
@@ -562,13 +582,13 @@ services:
 ### Database connection error
 - Kiểm tra PostgreSQL container đang chạy: `docker ps`
 - Kiểm tra port 5433 có bị conflict không
-- Kiểm tra credentials trong `application.properties`
+- Kiểm tra credentials trong `backend/src/main/resources/application.properties`
 
 ### Port 8080 already in use
-- Thay đổi port trong `application.properties`: `server.port=8081`
+- Thay đổi port trong `backend/src/main/resources/application.properties`: `server.port=8081`
 
 ### Build errors
-- Xóa `.gradle` folder và build lại
+- Xóa `backend/.gradle` và `backend/build` rồi build lại từ `backend/`
 - Kiểm tra Java version: `java -version` (phải là 17+)
 
 ## 📄 License
