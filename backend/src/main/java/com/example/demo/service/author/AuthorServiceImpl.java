@@ -52,8 +52,10 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<AuthorDTO> getAllAuthors(Pageable pageable, String search) {
-		String searchTerm = (search != null && !search.trim().isEmpty()) ? search : null;
-		Page<Author> authors = authorRepository.findAllWithSearch(searchTerm, pageable);
+		String searchTerm = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+		Page<Author> authors = (searchTerm == null)
+				? authorRepository.findAll(pageable)
+				: authorRepository.findAllWithSearch(searchTerm, pageable);
 		return authors.map(authorMapper::toDTO);
 	}
 

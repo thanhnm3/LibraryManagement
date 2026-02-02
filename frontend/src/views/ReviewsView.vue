@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute } from 'vue-router'
 import { RouterLink } from 'vue-router'
 import { getReviewsByUserId, updateReview, deleteReview } from '../api'
+import { useAuthStore } from '../stores/auth'
 
-const route = useRoute()
+const authStore = useAuthStore()
 const reviews = ref([])
 const isLoading = ref(false)
 const errorMessage = ref('')
@@ -14,14 +14,7 @@ const editComment = ref('')
 const isSubmitting = ref(false)
 const isDeleting = ref(null)
 
-const userId = computed(() => {
-  const id = route.query.userId
-  if (id) {
-    const num = Number(id)
-    return Number.isFinite(num) ? num : null
-  }
-  return null
-})
+const userId = computed(() => authStore.user?.id ?? null)
 
 const loadReviews = async () => {
   if (userId.value == null) return
@@ -50,15 +43,14 @@ const cancelEdit = () => {
 }
 
 const handleUpdate = async () => {
-  if (editingId.value == null || userId.value == null || isSubmitting.value) return
+  if (editingId.value == null || isSubmitting.value) return
   isSubmitting.value = true
   errorMessage.value = ''
   try {
-    await updateReview(
-      editingId.value,
-      { rating: editRating.value, comment: editComment.value.trim() || null },
-      userId.value
-    )
+    await updateReview(editingId.value, {
+      rating: editRating.value,
+      comment: editComment.value.trim() || null,
+    })
     await loadReviews()
     cancelEdit()
   } catch (err) {
@@ -70,12 +62,12 @@ const handleUpdate = async () => {
 }
 
 const handleDelete = async (reviewId) => {
-  if (userId.value == null || isDeleting.value != null) return
+  if (isDeleting.value != null) return
   if (!window.confirm('Delete this review?')) return
   isDeleting.value = reviewId
   errorMessage.value = ''
   try {
-    await deleteReview(reviewId, userId.value, false)
+    await deleteReview(reviewId)
     await loadReviews()
   } catch (err) {
     errorMessage.value = err.data?.message || err.message || 'Failed to delete review.'
@@ -97,12 +89,12 @@ watch(userId, loadReviews)
           My Reviews
         </h1>
         <p class="mt-2 max-w-2xl font-body text-slate-600">
-          Reviews you wrote. Use <code class="rounded bg-slate-100 px-1">?userId=1</code> to select a user (no auth yet).
+          Reviews you wrote.
         </p>
 
         <div v-if="userId == null" class="mt-10 clay-card max-w-2xl p-6">
           <p class="font-body text-slate-600">
-            Add <code class="rounded bg-slate-100 px-1">?userId=1</code> to the URL to see reviews for that user.
+            Loading your account…
           </p>
         </div>
 

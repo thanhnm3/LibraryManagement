@@ -1,4 +1,5 @@
-export { request } from './client.js'
+export { request, getStoredToken, setStoredAuth } from './client.js'
+export * from './auth.js'
 export * from './authors.js'
 export * from './books.js'
 export * from './categories.js'

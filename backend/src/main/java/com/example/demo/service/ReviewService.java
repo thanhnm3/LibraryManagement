@@ -24,15 +24,15 @@ public interface ReviewService {
 	ReviewDTO createReview(ReviewRequestDTO request);
 
 	/**
-	 * UC-REVIEW-002: Cập nhật đánh giá
-	 * Cập nhật review đã tồn tại
-	 * 
+	 * UC-REVIEW-002: Cập nhật đánh giá (owner hoặc admin)
+	 *
 	 * @param reviewId - ID của review
 	 * @param request  - Thông tin cập nhật
-	 * @param userId   - ID của user (để kiểm tra quyền)
+	 * @param userId   - ID của user thực hiện (để kiểm tra quyền)
+	 * @param isAdmin  - Có phải admin không
 	 * @return ReviewDTO - Thông tin review đã cập nhật
 	 */
-	ReviewDTO updateReview(Long reviewId, ReviewUpdateDTO request, Long userId);
+	ReviewDTO updateReview(Long reviewId, ReviewUpdateDTO request, Long userId, boolean isAdmin);
 
 	/**
 	 * UC-REVIEW-003: Xóa đánh giá

@@ -247,12 +247,23 @@ public class LoanServiceImpl implements LoanService {
 	@Override
 	@Transactional(readOnly = true)
 	public LoanStatisticsDTO getLoanStatistics(LocalDateTime startDate, LocalDateTime endDate) {
-		List<Loan> loans = loanRepository.findLoansByDateRange(startDate, endDate);
-		Long totalBorrowed = (long) loans.size();
-		Long totalReturned = loanRepository.countLoansByDateRangeAndStatus(
-				startDate, endDate, LoanStatus.RETURNED);
-		Long totalOverdue = loanRepository.countLoansByDateRangeAndStatus(
-				startDate, endDate, LoanStatus.OVERDUE);
+		Long totalBorrowed;
+		Long totalReturned;
+		Long totalOverdue;
+
+		boolean hasDateFilter = (startDate != null || endDate != null);
+		if (!hasDateFilter) {
+			totalBorrowed = loanRepository.count();
+			totalReturned = loanRepository.countByStatus(LoanStatus.RETURNED);
+			totalOverdue = loanRepository.countByStatus(LoanStatus.OVERDUE);
+		} else {
+			List<Loan> loans = loanRepository.findLoansByDateRange(startDate, endDate);
+			totalBorrowed = (long) loans.size();
+			totalReturned = loanRepository.countLoansByDateRangeAndStatus(
+					startDate, endDate, LoanStatus.RETURNED);
+			totalOverdue = loanRepository.countLoansByDateRangeAndStatus(
+					startDate, endDate, LoanStatus.OVERDUE);
+		}
 
 		LoanStatisticsDTO statistics = new LoanStatisticsDTO();
 		statistics.setTotalBorrowed(totalBorrowed);

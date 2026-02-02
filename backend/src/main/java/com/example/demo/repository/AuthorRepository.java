@@ -18,7 +18,6 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
 	@Query("SELECT a FROM Author a WHERE LOWER(a.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
 	List<Author> findByFullNameContainingIgnoreCase(@Param("searchTerm") String searchTerm);
 
-	@Query("SELECT a FROM Author a WHERE " +
-			"(:search IS NULL OR LOWER(a.fullName) LIKE LOWER(CONCAT('%', :search, '%')))")
+	@Query("SELECT a FROM Author a WHERE LOWER(a.fullName) LIKE LOWER(CONCAT('%', :search, '%'))")
 	Page<Author> findAllWithSearch(@Param("search") String search, Pageable pageable);
 }

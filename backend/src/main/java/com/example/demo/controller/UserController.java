@@ -14,7 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import com.example.demo.security.UserPrincipal;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,6 +44,7 @@ public class UserController {
 	 * UC-USER-002: Lấy danh sách người dùng
 	 */
 	@GetMapping
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Page<UserDTO>> getAllUsers(
 		@PageableDefault(size = 20) Pageable pageable,
 		@RequestParam(required = false) UserStatus status,
@@ -53,6 +58,7 @@ public class UserController {
 	 * UC-USER-003: Lấy thông tin người dùng
 	 */
 	@GetMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
 		UserDTO user = userService.getUserById(id);
 		return ResponseEntity.ok(user);
@@ -62,6 +68,7 @@ public class UserController {
 	 * UC-USER-004: Cập nhật thông tin người dùng
 	 */
 	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<UserDTO> updateUser(
 		@PathVariable Long id,
 		@Valid @RequestBody UserUpdateDTO updateDTO
@@ -71,13 +78,20 @@ public class UserController {
 	}
 
 	/**
-	 * UC-USER-005: Thay đổi mật khẩu
+	 * UC-USER-005: Thay đổi mật khẩu (chỉ user đổi mật khẩu của chính mình hoặc ADMIN)
 	 */
 	@PutMapping("/{id}/password")
 	public ResponseEntity<Void> changePassword(
 		@PathVariable Long id,
-		@Valid @RequestBody ChangePasswordDTO changePasswordDTO
+		@Valid @RequestBody ChangePasswordDTO changePasswordDTO,
+		Authentication authentication
 	) {
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+		boolean isSelf = principal.getId().equals(id);
+		boolean isAdmin = principal.getRole() == UserRole.ADMIN;
+		if (!isSelf && !isAdmin) {
+			throw new AccessDeniedException("Cannot change another user's password");
+		}
 		userService.changePassword(id, changePasswordDTO);
 		return ResponseEntity.noContent().build();
 	}
@@ -86,6 +100,7 @@ public class UserController {
 	 * UC-USER-006: Cập nhật trạng thái người dùng
 	 */
 	@PutMapping("/{id}/status")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<UserDTO> updateUserStatus(
 		@PathVariable Long id,
 		@Valid @RequestBody UpdateUserStatusDTO updateStatusDTO
@@ -98,6 +113,7 @@ public class UserController {
 	 * UC-USER-007: Cập nhật role người dùng
 	 */
 	@PutMapping("/{id}/role")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<UserDTO> updateUserRole(
 		@PathVariable Long id,
 		@Valid @RequestBody UpdateUserRoleDTO updateRoleDTO

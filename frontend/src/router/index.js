@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { ROUTES } from '../constants/routes'
+import { useAuthStore } from '../stores/auth'
 import HomeView from '../views/HomeView.vue'
 import BooksView from '../views/BooksView.vue'
 import LoansView from '../views/LoansView.vue'
 import ReviewsView from '../views/ReviewsView.vue'
 import JoinView from '../views/JoinView.vue'
+import LoginView from '../views/LoginView.vue'
 import BookDetailView from '../views/BookDetailView.vue'
 import SearchView from '../views/SearchView.vue'
 import LoanCreateView from '../views/LoanCreateView.vue'
@@ -40,31 +42,37 @@ const routes = [
     path: ROUTES.LOANS,
     name: 'loans',
     component: LoansView,
-    meta: { title: 'Library Hub - My Loans' },
+    meta: { title: 'Library Hub - My Loans', requiresAuth: true },
   },
   {
     path: ROUTES.LOAN_NEW,
     name: 'loanNew',
     component: LoanCreateView,
-    meta: { title: 'Library Hub - Borrow a Book' },
+    meta: { title: 'Library Hub - Borrow a Book', requiresAuth: true },
   },
   {
     path: '/loans/:id',
     name: 'loanDetail',
     component: LoanDetailView,
-    meta: { title: 'Library Hub - Loan Detail' },
+    meta: { title: 'Library Hub - Loan Detail', requiresAuth: true },
   },
   {
     path: ROUTES.REVIEWS,
     name: 'reviews',
     component: ReviewsView,
-    meta: { title: 'Library Hub - Reviews' },
+    meta: { title: 'Library Hub - Reviews', requiresAuth: true },
   },
   {
     path: ROUTES.JOIN,
     name: 'join',
     component: JoinView,
     meta: { title: 'Library Hub - Join' },
+  },
+  {
+    path: ROUTES.LOGIN,
+    name: 'login',
+    component: LoginView,
+    meta: { title: 'Library Hub - Log in' },
   },
   {
     path: ROUTES.ADMIN,
@@ -189,6 +197,24 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from, next) => {
+  const authStore = useAuthStore()
+
+  if (to.meta?.requiresAdmin) {
+    if (!authStore.isAuthenticated) {
+      next({ path: ROUTES.LOGIN, query: { redirect: to.fullPath } })
+      return
+    }
+    if (!authStore.isAdmin) {
+      next(ROUTES.HOME)
+      return
+    }
+  }
+
+  if (to.meta?.requiresAuth && !authStore.isAuthenticated) {
+    next({ path: ROUTES.LOGIN, query: { redirect: to.fullPath } })
+    return
+  }
+
   if (to.meta?.title) {
     document.title = to.meta.title
   }

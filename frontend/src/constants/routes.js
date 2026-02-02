@@ -7,6 +7,7 @@ export const ROUTES = {
   BOOK_DETAIL: '/books/:id',
   SEARCH: '/search',
   JOIN: '/join',
+  LOGIN: '/login',
   LOANS: '/loans',
   LOAN_DETAIL: '/loans/:id',
   LOAN_NEW: '/loans/new',

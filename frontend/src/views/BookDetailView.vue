@@ -3,8 +3,10 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { RouterLink } from 'vue-router'
 import { getBookById, getReviewsByBookId, getAverageRatingByBookId, createReview, updateReview, deleteReview } from '../api'
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
 const bookId = computed(() => Number(route.params.id))
 const book = ref(null)
 const reviews = ref([])
@@ -23,14 +25,7 @@ const editComment = ref('')
 const isSubmitting = ref(false)
 const isDeleting = ref(null)
 
-const userId = computed(() => {
-  const id = route.query.userId
-  if (id) {
-    const num = Number(id)
-    return Number.isFinite(num) ? num : null
-  }
-  return null
-})
+const userId = computed(() => authStore.user?.id ?? null)
 
 const loadBook = async () => {
   isLoading.value = true
@@ -116,15 +111,14 @@ const cancelEditReview = () => {
 }
 
 const handleUpdateReview = async () => {
-  if (editingReviewId.value == null || userId.value == null || isSubmitting.value) return
+  if (editingReviewId.value == null || isSubmitting.value) return
   isSubmitting.value = true
   errorMessage.value = ''
   try {
-    await updateReview(
-      editingReviewId.value,
-      { rating: editRating.value, comment: editComment.value.trim() || null },
-      userId.value
-    )
+    await updateReview(editingReviewId.value, {
+      rating: editRating.value,
+      comment: editComment.value.trim() || null,
+    })
     cancelEditReview()
     await Promise.all([loadReviews(), loadAverageRating()])
   } catch (err) {
@@ -136,12 +130,12 @@ const handleUpdateReview = async () => {
 }
 
 const handleDeleteReview = async (reviewId) => {
-  if (userId.value == null || isDeleting.value != null) return
+  if (isDeleting.value != null) return
   if (!window.confirm('Delete this review?')) return
   isDeleting.value = reviewId
   errorMessage.value = ''
   try {
-    await deleteReview(reviewId, userId.value, false)
+    await deleteReview(reviewId)
     await Promise.all([loadReviews(), loadAverageRating()])
   } catch (err) {
     errorMessage.value = err.data?.message || err.message || 'Failed to delete review.'
@@ -259,7 +253,7 @@ watch(reviewPage, loadReviews)
             </div>
           </div>
           <p v-if="userId == null" class="mt-2 font-body text-sm text-slate-600">
-            Add <code class="rounded bg-slate-100 px-1">?userId=1</code> to the URL to add a review.
+            Log in to add a review.
           </p>
 
           <ul class="mt-6 space-y-4" role="list">

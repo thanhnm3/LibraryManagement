@@ -1,25 +1,18 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute } from 'vue-router'
 import { RouterLink } from 'vue-router'
 import { getActiveLoansByUserId, getLoanHistoryByUserId } from '../api'
 import { ROUTES } from '../constants/routes'
+import { useAuthStore } from '../stores/auth'
 
-const route = useRoute()
+const authStore = useAuthStore()
 const activeTab = ref('active')
 const activeLoans = ref([])
 const historyLoans = ref([])
 const isLoading = ref(false)
 const errorMessage = ref('')
 
-const userId = computed(() => {
-  const id = route.query.userId
-  if (id) {
-    const num = Number(id)
-    return Number.isFinite(num) ? num : null
-  }
-  return null
-})
+const userId = computed(() => authStore.user?.id ?? null)
 
 const loadActive = async () => {
   if (userId.value == null) return
@@ -67,7 +60,7 @@ const getStatusClass = (status) => {
 }
 
 onMounted(loadData)
-watch(userId, loadData)
+watch(userId, (newId) => { if (newId != null) loadData() })
 </script>
 
 <template>
@@ -78,15 +71,12 @@ watch(userId, loadData)
           My Loans
         </h1>
         <p class="mt-2 max-w-2xl font-body text-slate-600">
-          View your active borrows and history. Use <code class="rounded bg-slate-100 px-1">?userId=1</code> to select a user (no auth yet).
+          View your active borrows and history.
         </p>
 
         <div v-if="userId == null" class="mt-10 clay-card max-w-2xl p-6">
           <p class="font-body text-slate-600">
-            Add <code class="rounded bg-slate-100 px-1">?userId=1</code> to the URL to see loans for that user, or
-            <RouterLink :to="ROUTES.LOAN_NEW" class="font-medium text-primary hover:underline">
-              borrow a book
-            </RouterLink>.
+            Loading your account…
           </p>
         </div>
 
