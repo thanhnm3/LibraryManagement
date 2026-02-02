@@ -64,11 +64,12 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public ReviewDTO updateReview(Long reviewId, ReviewUpdateDTO request, Long userId) {
+	public ReviewDTO updateReview(Long reviewId, ReviewUpdateDTO request, Long userId, boolean isAdmin) {
 		Review review = reviewRepository.findById(reviewId)
 				.orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + reviewId));
 
-		if (!review.getUser().getId().equals(userId)) {
+		boolean isOwner = review.getUser().getId().equals(userId);
+		if (!isOwner && !isAdmin) {
 			throw new BusinessException("User is not the owner of this review");
 		}
 

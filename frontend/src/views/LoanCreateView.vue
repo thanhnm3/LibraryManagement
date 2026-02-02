@@ -1,24 +1,23 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getAllBooks, getAllUsers, borrowBook } from '../api'
+import { getAllBooks, borrowBook } from '../api'
 import { ROUTES } from '../constants/routes'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const route = useRoute()
-const userId = ref(null)
+const authStore = useAuthStore()
 const bookId = ref(null)
 const dueDate = ref('')
 const books = ref([])
-const users = ref([])
 const isLoading = ref(true)
 const isSubmitting = ref(false)
 const errorMessage = ref('')
-const totalBooks = ref(0)
-const totalUsers = ref(0)
 const bookPage = ref(0)
-const userPage = ref(0)
 const pageSize = 50
+
+const currentUserId = computed(() => authStore.user?.id ?? null)
 
 const preselectedBookId = computed(() => {
   const id = route.query.bookId
@@ -32,20 +31,13 @@ const preselectedBookId = computed(() => {
 const loadBooks = async () => {
   const res = await getAllBooks(bookPage.value, pageSize)
   books.value = res.content || []
-  totalBooks.value = res.totalElements ?? 0
-}
-
-const loadUsers = async () => {
-  const res = await getAllUsers({ page: userPage.value, size: pageSize })
-  users.value = res.content || []
-  totalUsers.value = res.totalElements ?? 0
 }
 
 const loadData = async () => {
   isLoading.value = true
   errorMessage.value = ''
   try {
-    await Promise.all([loadBooks(), loadUsers()])
+    await loadBooks()
     if (preselectedBookId.value) {
       bookId.value = preselectedBookId.value
     }
@@ -59,7 +51,7 @@ const loadData = async () => {
 
 const isFormValid = computed(() => {
   return (
-    userId.value != null &&
+    currentUserId.value != null &&
     bookId.value != null &&
     dueDate.value.trim() !== ''
   )
@@ -71,7 +63,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true
   try {
     await borrowBook({
-      userId: Number(userId.value),
+      userId: currentUserId.value,
       bookId: Number(bookId.value),
       dueDate: dueDate.value.trim(),
     })
@@ -94,29 +86,13 @@ onMounted(loadData)
         Borrow a Book
       </h1>
       <p class="mt-2 font-body text-slate-600">
-        Select user, book, and due date.
+        Select book and due date to borrow for your account.
       </p>
 
       <p v-if="isLoading" class="mt-6 font-body text-slate-600">
         Loading…
       </p>
       <form v-else class="mt-8 space-y-4" @submit.prevent="handleSubmit">
-        <div>
-          <label for="loan-userId" class="block font-body text-sm font-medium text-slate-700">
-            User
-          </label>
-          <select
-            id="loan-userId"
-            v-model="userId"
-            required
-            class="mt-1 block w-full rounded-clay border border-slate-300 px-3 py-2 font-body text-slate-900 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option :value="null" disabled>Select user</option>
-            <option v-for="u in users" :key="u.id" :value="u.id">
-              {{ u.fullName }} ({{ u.email }})
-            </option>
-          </select>
-        </div>
         <div>
           <label for="loan-bookId" class="block font-body text-sm font-medium text-slate-700">
             Book

@@ -105,4 +105,18 @@ public class UserServiceImpl implements UserService {
 		User updatedUser = userRepository.save(user);
 		return userMapper.toDTO(updatedUser);
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public User authenticate(String email, String password) {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new BusinessException("Invalid email or password"));
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new BusinessException("Account is not active");
+		}
+		if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+			throw new BusinessException("Invalid email or password");
+		}
+		return user;
+	}
 }

@@ -1,6 +1,7 @@
 package com.example.demo.service.user;
 
 import com.example.demo.dto.user.ChangePasswordDTO;
+import com.example.demo.entity.User;
 import com.example.demo.dto.user.UpdateUserRoleDTO;
 import com.example.demo.dto.user.UpdateUserStatusDTO;
 import com.example.demo.dto.user.UserDTO;
@@ -76,4 +77,14 @@ public interface UserService {
 	 * @return UserDTO
 	 */
 	UserDTO updateUserRole(Long userId, UpdateUserRoleDTO updateRoleDTO);
+
+	/**
+	 * Xác thực đăng nhập: tìm user theo email, kiểm tra ACTIVE và mật khẩu.
+	 *
+	 * @param email    - Email người dùng
+	 * @param password - Mật khẩu plain
+	 * @return User nếu hợp lệ
+	 * @throws com.example.demo.exception.BusinessException nếu email/password sai hoặc tài khoản không ACTIVE
+	 */
+	User authenticate(String email, String password);
 }

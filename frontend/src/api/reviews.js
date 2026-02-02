@@ -10,30 +10,22 @@ export function createReview(body) {
 }
 
 /**
- * Update review.
+ * Update review (userId from token).
  * @param {number} reviewId
  * @param {import('../types/review.types').ReviewUpdateDTO} body
- * @param {number} userId
  * @returns {Promise<import('../types/review.types').ReviewDTO>}
  */
-export function updateReview(reviewId, body, userId) {
-  return request('PUT', `/reviews/${reviewId}`, {
-    body,
-    query: { userId },
-  })
+export function updateReview(reviewId, body) {
+  return request('PUT', `/reviews/${reviewId}`, { body })
 }
 
 /**
- * Delete review.
+ * Delete review (userId and isAdmin from token).
  * @param {number} reviewId
- * @param {number} userId
- * @param {boolean} [isAdmin=false]
  * @returns {Promise<null>}
  */
-export function deleteReview(reviewId, userId, isAdmin = false) {
-  return request('DELETE', `/reviews/${reviewId}`, {
-    query: { userId, isAdmin },
-  })
+export function deleteReview(reviewId) {
+  return request('DELETE', `/reviews/${reviewId}`)
 }
 
 /**

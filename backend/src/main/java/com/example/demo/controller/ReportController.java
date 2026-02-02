@@ -6,6 +6,7 @@ import com.example.demo.dto.review.ReviewReportDTO;
 import com.example.demo.service.ReportService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ public class ReportController {
 	 * UC-REPORT-001: Báo cáo thống kê tổng quan (Admin)
 	 */
 	@GetMapping("/dashboard")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<DashboardStatisticsDTO> getDashboardStatistics() {
 		DashboardStatisticsDTO statistics = reportService.getDashboardStatistics();
 		return ResponseEntity.ok(statistics);
@@ -33,6 +35,7 @@ public class ReportController {
 	 * UC-REPORT-002: Báo cáo hoạt động mượn trả theo thời gian
 	 */
 	@GetMapping("/loans")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<LoanReportDTO> getLoanReport(
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
@@ -44,6 +47,7 @@ public class ReportController {
 	 * UC-REPORT-003: Báo cáo đánh giá sách
 	 */
 	@GetMapping("/reviews")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ReviewReportDTO> getReviewReport(@RequestParam(required = false) Long bookId) {
 		ReviewReportDTO report = reportService.getReviewReport(bookId);
 		return ResponseEntity.ok(report);

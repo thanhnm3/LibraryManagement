@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,6 +28,7 @@ public class AuthorController {
 	 * UC-AUTHOR-001: Tạo tác giả mới
 	 */
 	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<AuthorDTO> createAuthor(@Valid @RequestBody AuthorRequestDTO requestDTO) {
 		AuthorDTO createdAuthor = authorService.createAuthor(requestDTO);
 		return new ResponseEntity<>(createdAuthor, HttpStatus.CREATED);
@@ -57,6 +59,7 @@ public class AuthorController {
 	 * UC-AUTHOR-004: Cập nhật thông tin tác giả
 	 */
 	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<AuthorDTO> updateAuthor(
 		@PathVariable Long id,
 		@Valid @RequestBody AuthorUpdateDTO updateDTO
@@ -69,6 +72,7 @@ public class AuthorController {
 	 * UC-AUTHOR-005: Xóa tác giả
 	 */
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> deleteAuthor(@PathVariable Long id) {
 		authorService.deleteAuthor(id);
 		return ResponseEntity.noContent().build();

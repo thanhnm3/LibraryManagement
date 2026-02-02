@@ -1,8 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { ROUTES } from '../constants/routes'
+import { useAuthStore } from '../stores/auth'
 
+const router = useRouter()
+const authStore = useAuthStore()
 const isMenuOpen = ref(false)
 
 const toggleMenu = () => {
@@ -11,6 +14,12 @@ const toggleMenu = () => {
 
 const closeMenu = () => {
   isMenuOpen.value = false
+}
+
+const handleLogout = () => {
+  authStore.logout()
+  closeMenu()
+  router.push(ROUTES.HOME)
 }
 </script>
 
@@ -63,16 +72,37 @@ const closeMenu = () => {
             Reviews
           </RouterLink>
         </li>
-        <li>
+        <li v-if="authStore.isAdmin">
           <RouterLink :to="ROUTES.ADMIN" class="font-body font-medium text-slate-700 transition-colors duration-200 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
             Admin
           </RouterLink>
         </li>
-        <li>
-          <RouterLink :to="ROUTES.JOIN" class="clay-btn inline-block bg-primary px-5 py-2.5 text-white">
-            Join the Library
-          </RouterLink>
-        </li>
+        <template v-if="authStore.isAuthenticated">
+          <li class="font-body font-medium text-slate-700">
+            {{ authStore.user?.fullName || authStore.user?.email }}
+          </li>
+          <li>
+            <button
+              type="button"
+              class="clay-btn inline-block border border-slate-300 bg-white px-5 py-2.5 font-body text-slate-700 hover:bg-slate-50"
+              @click="handleLogout"
+            >
+              Logout
+            </button>
+          </li>
+        </template>
+        <template v-else>
+          <li>
+            <RouterLink :to="ROUTES.LOGIN" class="font-body font-medium text-slate-700 transition-colors duration-200 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+              Login
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink :to="ROUTES.JOIN" class="clay-btn inline-block bg-primary px-5 py-2.5 text-white">
+              Join the Library
+            </RouterLink>
+          </li>
+        </template>
       </ul>
 
       <button
@@ -120,20 +150,41 @@ const closeMenu = () => {
             Reviews
           </RouterLink>
         </li>
-        <li>
+        <li v-if="authStore.isAdmin">
           <RouterLink :to="ROUTES.ADMIN" class="block py-2 font-body font-medium text-slate-700" @click="closeMenu">
             Admin
           </RouterLink>
         </li>
-        <li>
-          <RouterLink
-            :to="ROUTES.JOIN"
-            class="clay-btn mt-2 inline-block bg-primary px-5 py-2.5 text-center text-white"
-            @click="closeMenu"
-          >
-            Join the Library
-          </RouterLink>
-        </li>
+        <template v-if="authStore.isAuthenticated">
+          <li class="block py-2 font-body font-medium text-slate-700">
+            {{ authStore.user?.fullName || authStore.user?.email }}
+          </li>
+          <li>
+            <button
+              type="button"
+              class="clay-btn mt-2 inline-block w-full border border-slate-300 bg-white px-5 py-2.5 text-center font-body text-slate-700"
+              @click="handleLogout"
+            >
+              Logout
+            </button>
+          </li>
+        </template>
+        <template v-else>
+          <li>
+            <RouterLink :to="ROUTES.LOGIN" class="block py-2 font-body font-medium text-slate-700" @click="closeMenu">
+              Login
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink
+              :to="ROUTES.JOIN"
+              class="clay-btn mt-2 inline-block w-full bg-primary px-5 py-2.5 text-center text-white"
+              @click="closeMenu"
+            >
+              Join the Library
+            </RouterLink>
+          </li>
+        </template>
       </ul>
     </div>
   </header>

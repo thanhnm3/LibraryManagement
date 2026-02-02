@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,6 +28,7 @@ public class CategoryController {
 	 * UC-CATEGORY-001: Tạo danh mục mới
 	 */
 	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryRequestDTO requestDTO) {
 		CategoryDTO createdCategory = categoryService.createCategory(requestDTO);
 		return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
@@ -37,7 +39,7 @@ public class CategoryController {
 	 */
 	@GetMapping
 	public ResponseEntity<Page<CategoryDTO>> getAllCategories(
-		@PageableDefault(size = 20) Pageable pageable
+		@PageableDefault(size = 20, sort = "id") Pageable pageable
 	) {
 		Page<CategoryDTO> categories = categoryService.getAllCategories(pageable);
 		return ResponseEntity.ok(categories);
@@ -56,6 +58,7 @@ public class CategoryController {
 	 * UC-CATEGORY-004: Cập nhật thông tin danh mục
 	 */
 	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<CategoryDTO> updateCategory(
 		@PathVariable Long id,
 		@Valid @RequestBody CategoryUpdateDTO updateDTO
@@ -68,6 +71,7 @@ public class CategoryController {
 	 * UC-CATEGORY-005: Xóa danh mục
 	 */
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
 		categoryService.deleteCategory(id);
 		return ResponseEntity.noContent().build();

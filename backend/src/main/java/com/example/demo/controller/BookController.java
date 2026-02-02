@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,6 +28,7 @@ public class BookController {
 	 * UC-BOOK-001: Tạo sách mới
 	 */
 	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<BookDTO> createBook(@Valid @RequestBody BookRequestDTO requestDTO) {
 		BookDTO createdBook = bookService.createBook(requestDTO);
 		return new ResponseEntity<>(createdBook, HttpStatus.CREATED);
@@ -56,6 +58,7 @@ public class BookController {
 	 * UC-BOOK-004: Cập nhật thông tin sách
 	 */
 	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<BookDTO> updateBook(
 		@PathVariable Long id,
 		@Valid @RequestBody BookUpdateDTO updateDTO
@@ -68,6 +71,7 @@ public class BookController {
 	 * UC-BOOK-005: Xóa sách
 	 */
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
 		bookService.deleteBook(id);
 		return ResponseEntity.noContent().build();
